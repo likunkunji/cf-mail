@@ -53,11 +53,30 @@ function decodeBase64(str: string): Uint8Array {
   return bytes
 }
 
-// 解码 Quoted-Printable
-function decodeQuotedPrintable(str: string): string {
-  return str
-    .replace(/=\r?\n/g, '') // 软换行
-    .replace(/=([0-9A-F]{2})/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+// 解码 Quoted-Printable（返回字节数组，由调用方决定字符集）
+function decodeQuotedPrintableBytes(str: string): Uint8Array {
+  const cleaned = str.replace(/=\r?\n/g, '') // 软换行
+  const bytes: number[] = []
+  let i = 0
+  while (i < cleaned.length) {
+    if (cleaned[i] === '=' && i + 2 < cleaned.length) {
+      const hex = cleaned.substring(i + 1, i + 3)
+      if (/^[0-9A-Fa-f]{2}$/.test(hex)) {
+        bytes.push(parseInt(hex, 16))
+        i += 3
+        continue
+      }
+    }
+    bytes.push(cleaned.charCodeAt(i))
+    i++
+  }
+  return new Uint8Array(bytes)
+}
+
+// 从 Content-Type 提取 charset
+function getCharset(contentType: string): string {
+  const match = contentType.match(/charset=["']?([^"';\s]+)["']?/i)
+  return match ? match[1].toLowerCase() : 'utf-8'
 }
 
 // 解析邮件头部
@@ -125,16 +144,22 @@ function parsePart(
 
   // 解码内容
   let decodedBody: string | Uint8Array = bodySection
+  const charset = getCharset(contentType)
 
   if (contentTransferEncoding.toLowerCase() === 'base64') {
     if (contentType.startsWith('text/')) {
       const bytes = decodeBase64(bodySection)
-      decodedBody = new TextDecoder('utf-8').decode(bytes)
+      decodedBody = new TextDecoder(charset).decode(bytes)
     } else {
       decodedBody = decodeBase64(bodySection)
     }
   } else if (contentTransferEncoding.toLowerCase() === 'quoted-printable') {
-    decodedBody = decodeQuotedPrintable(bodySection)
+    const bytes = decodeQuotedPrintableBytes(bodySection)
+    if (contentType.startsWith('text/')) {
+      decodedBody = new TextDecoder(charset).decode(bytes)
+    } else {
+      decodedBody = bytes
+    }
   }
 
   // 判断是附件还是正文
@@ -215,12 +240,14 @@ export function parseEmail(rawEmail: string): ParsedEmail {
   } else {
     // 单体邮件
     let decodedBody = bodySection
+    const charset = getCharset(contentType)
 
     if (contentTransferEncoding.toLowerCase() === 'base64') {
       const bytes = decodeBase64(bodySection)
-      decodedBody = new TextDecoder('utf-8').decode(bytes)
+      decodedBody = new TextDecoder(charset).decode(bytes)
     } else if (contentTransferEncoding.toLowerCase() === 'quoted-printable') {
-      decodedBody = decodeQuotedPrintable(bodySection)
+      const bytes = decodeQuotedPrintableBytes(bodySection)
+      decodedBody = new TextDecoder(charset).decode(bytes)
     }
 
     if (contentType.includes('text/html')) {

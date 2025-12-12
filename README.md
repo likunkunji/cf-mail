@@ -11,10 +11,8 @@ Just Simple One CF-Mail.
 
 ## 展示
 
-<!-- TODO: 添加截图 -->
-| 收件箱 | 邮件详情 | TG 推送 |
-|--------|----------|---------|
-| ![收件箱](docs/images/inbox.png) | ![邮件详情](docs/images/detail.png) | ![TG推送](docs/images/telegram.png) |
+![alt text](<asset/image copy 12.png>)
+
 
 ## 部署
 
@@ -43,8 +41,13 @@ Just Simple One CF-Mail.
 3. 点击 **Create** → **Pages** → **Connect to Git**
 4. 选择你 Fork 的 `cf-mail` 仓库
 
-![alt text](<asset/image copy.png>)
+
 ![alt text](<asset/image copy 2.png>)
+
+![alt text](<asset/image copy 3.png>)
+
+![alt text](<asset/image copy 4.png>)
+
 
 **3. 配置构建设置**
 
@@ -52,8 +55,7 @@ Just Simple One CF-Mail.
 - Build command: `npm run build`
 - Build output directory: `dist`
 
-<!-- TODO: 添加构建配置截图 -->
-<!-- ![构建配置](docs/images/cf-build.png) -->
+## 大白话就是什么都不用管！
 
 **4. 配置环境变量**
 
@@ -67,8 +69,7 @@ Just Simple One CF-Mail.
 | `TG_BOT_TOKEN` | Telegram Bot Token | ❌ |
 | `TG_CHAT_ID` | Telegram Chat ID | ❌ |
 
-<!-- TODO: 添加环境变量配置截图 -->
-<!-- ![环境变量](docs/images/cf-env.png) -->
+![alt text](<asset/image copy.png>)
 
 **5. 绑定 D1 数据库和 R2 存储**
 
@@ -78,8 +79,7 @@ Just Simple One CF-Mail.
    - D1 Database: 变量名 `DB`
    - R2 Bucket: 变量名 `R2`
 
-<!-- TODO: 添加绑定截图 -->
-<!-- ![绑定](docs/images/cf-bindingpng) -->
+## 大白话就是根本不用管
 
 **6. 部署**
 
@@ -94,8 +94,11 @@ Just Simple One CF-Mail.
 3. 添加路由规则：
    - **Catch-all** → **Send to Worker** → 选择 `cf-mail`
 
-<!-- TODO: 添加 Email Routing 配置截图 -->
-<!-- ![Email Routing](docs/images/email-routing.png) -->
+![alt text](<asset/image copy 9.png>)
+
+![alt text](<asset/image copy 10.png>)
+
+![alt text](<asset/image copy 11.png>)
 
 > 数据库表会在首次访问时自动创建，无需手动初始化。
 
@@ -107,8 +110,9 @@ Just Simple One CF-Mail.
 2. 发送 `/newbot`，按提示设置名称
 3. 获取 `Bot Token`
 
-<!-- TODO: 添加 BotFather 截图 -->
-<!-- ![BotFather](docs/images/tg-botfather.png) -->
+![alt text](<asset/image copy 5.png>)
+
+![alt text](<asset/image copy 7.png>)
 
 **2. 获取 Chat ID**
 
@@ -116,11 +120,15 @@ Just Simple One CF-Mail.
 2. 访问 `https://api.telegram.org/bot<你的TOKEN>/getUpdates`
 3. 在返回的 JSON 中找到 `chat.id`
 
+![alt text](<asset/image copy 6.png>)
+
 **3. 配置环境变量**
 
 在 Cloudflare Dashboard 添加：
 - `TG_BOT_TOKEN`: 你的 Bot Token
 - `TG_CHAT_ID`: 你的 Chat ID
+
+![alt text](<asset/image copy 8.png>)
 
 配置后，新邮件会自动推送到 Telegram：
 
