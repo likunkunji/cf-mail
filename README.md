@@ -8,6 +8,7 @@ Just Simple One CF-Mail.
 - **仅收件** - 不支持发件，简单纯粹
 - **验证码提取** - 自动识别邮件中的验证码，一键复制
 - **Telegram 推送** - 新邮件实时推送到 TG，验证码直接显示
+- **自动创建邮箱** - 在主页设置中打开开关后，无需进入到邮箱页面可收码，自动创建的邮箱可以批量删除
 
 ## 展示
 
@@ -70,8 +71,6 @@ Just Simple One CF-Mail.
 | `ADMIN_PASSWORD` | 登录密码 | ✅ |
 | `JWT_SECRET` | JWT 签名密钥（随机字符串） | ✅ |
 | `MAIL_DOMAIN` | 邮箱域名（如 `example.com`） | ✅ |
-| `TG_BOT_TOKEN` | Telegram Bot Token | ❌ |
-| `TG_CHAT_ID` | Telegram Chat ID | ❌ |
 
 ![alt text](<asset/image copy.png>)
 
@@ -126,13 +125,11 @@ Just Simple One CF-Mail.
 
 ![alt text](<asset/image copy 6.png>)
 
-**3. 配置环境变量**
+**3. 配置变量**
 
-在 Cloudflare Dashboard 添加：
-- `TG_BOT_TOKEN`: 你的 Bot Token
-- `TG_CHAT_ID`: 你的 Chat ID
+在主页设置中打开开关：
 
-![alt text](<asset/image copy 8.png>)
+![alt text](<asset/image copy 15.png>)
 
 配置后，新邮件会自动推送到 Telegram：
 
