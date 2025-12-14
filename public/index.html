@@ -527,8 +527,15 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Chat ID <span class="text-red-500">*</span></label>
-                            <input type="text" x-model="settings.tg_chat_id" placeholder="-1001234567890" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-1 focus:ring-blue-500">
+                            <div class="flex gap-2">
+                                <input type="text" x-model="settings.tg_chat_id" placeholder="-1001234567890" required
+                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:ring-1 focus:ring-blue-500">
+                                <button type="button" @click="fetchChatId" :disabled="!settings.tg_bot_token || fetchingChatId"
+                                    class="px-3 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <span x-show="!fetchingChatId">获取</span>
+                                    <span x-show="fetchingChatId">...</span>
+                                </button>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Topic ID <span class="text-gray-400 text-xs">(可选)</span></label>
@@ -586,6 +593,7 @@
                     tg_topic_id: ''
                 },
                 tgEnabled: false,
+                fetchingChatId: false,
 
                 async init() {
                     // Check auth status by trying to fetch mailboxes (or check cookie existence if we could, but HTTPOnly)
@@ -853,6 +861,30 @@
                         this.selectedMailbox = null;
                         this.messages = [];
                         this.selectedMessage = null;
+                    }
+                },
+
+                async fetchChatId() {
+                    if (!this.settings.tg_bot_token) return;
+                    this.fetchingChatId = true;
+                    try {
+                        const res = await fetch(`https://api.telegram.org/bot${this.settings.tg_bot_token}/getUpdates`);
+                        const data = await res.json();
+                        if (!data.ok) {
+                            alert(data.description || 'Token 无效');
+                            return;
+                        }
+                        const lastMsg = data.result?.filter(u => u.message).pop();
+                        if (!lastMsg?.message) {
+                            alert('请先向 Bot 发送一条消息');
+                            return;
+                        }
+                        this.settings.tg_chat_id = String(lastMsg.message.chat.id);
+                        this.showToast('Chat ID 获取成功');
+                    } catch (e) {
+                        alert('获取失败');
+                    } finally {
+                        this.fetchingChatId = false;
                     }
                 }
             }
